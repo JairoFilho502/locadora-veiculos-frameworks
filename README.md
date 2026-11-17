@@ -17,7 +17,7 @@ Projeto final da disciplina Programação com Frameworks Web. O sistema permite 
 - Prisma ORM com MySQL
 - JWT (jsonwebtoken) e bcrypt
 - Zod para validação de entradas
-- React
+- React com Vite, React Router e Axios
 
 ## Funcionalidades
 
@@ -25,6 +25,7 @@ Projeto final da disciplina Programação com Frameworks Web. O sistema permite 
 - Cadastro de veículos com placa única e valor da diária positivo.
 - Listagem de veículos, com filtro de disponibilidade.
 - Registro, consulta do histórico e finalização de locações, com cálculo do valor total no backend.
+- Interface em React com login, cadastro, rotas protegidas e tela de veículos.
 
 ## Requisitos
 
@@ -97,6 +98,36 @@ npm run dev
 
 A API fica disponível em `http://localhost:3000`. Para verificar, acesse `http://localhost:3000/health`, que deve responder `{"status":"ok"}`.
 
+## Instalação e execução do frontend
+
+Com o backend em execução, abra outro terminal na raiz do projeto:
+
+```bash
+cd Frontend
+npm install
+cp .env.example .env
+```
+
+No Windows (PowerShell):
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Variável do `Frontend/.env`:
+
+```
+VITE_API_URL=http://localhost:3000
+```
+
+Inicie a aplicação:
+
+```bash
+npm run dev
+```
+
+O frontend fica disponível em `http://localhost:5173`. Para entrar, use o usuário de demonstração descrito na seção de dados de exemplo. Depois de alterar o `.env`, reinicie o servidor do Vite.
+
 ## Dados de exemplo
 
 O comando `npm run seed` cria um usuário de demonstração e 8 veículos. Ele pode ser executado várias vezes sem duplicar registros.
@@ -105,6 +136,17 @@ O comando `npm run seed` cria um usuário de demonstração e 8 veículos. Ele p
 |---|---|
 | E-mail | `demo@locadora.com` |
 | Senha | `123456` |
+
+## Telas do frontend
+
+| Rota | Tela | Acesso |
+|---|---|---|
+| `/login` | Login | Público |
+| `/cadastro` | Cadastro de usuário | Público |
+| `/` | Início, com o usuário logado e o botão de sair | Exige login |
+| `/veiculos` | Cadastro de veículos, listagem e filtro de disponibilidade | Exige login |
+
+As rotas protegidas redirecionam para `/login` quando não há usuário autenticado.
 
 ## Endpoints
 
@@ -172,6 +214,18 @@ Backend/
     databases/     instância do Prisma Client
 ```
 
+## Organização do frontend
+
+```
+Frontend/src/
+  services/      api.js (cliente Axios com token) e veiculoService.js
+  contexts/      AuthContext (usuário logado, login, cadastro e logout)
+  components/    ProtectedRoute, VeiculoForm e VeiculoLista
+  pages/         Login, Cadastro, Home e Veiculos
+  App.jsx        definição das rotas
+  main.jsx       BrowserRouter e AuthProvider
+```
+
 ## Modelagem do banco
 
 - **Usuario**: id, nome, e-mail (único), senha (hash) e data de cadastro.
@@ -180,6 +234,8 @@ Backend/
 - Um usuário possui várias locações e um veículo possui várias locações (relacionamentos 1:N definidos no `schema.prisma`, com chaves estrangeiras e migrations).
 
 ## Decisões de implementação
+
+### Backend
 
 - Route, Controller e Service são separados. As rotas apenas mapeiam os endpoints, os controllers cuidam da requisição e da resposta HTTP, e os services concentram validações e regras de negócio.
 - As entradas são validadas com Zod nos services. Os erros de validação são convertidos em resposta `400` por um middleware de tratamento de erros.
@@ -191,3 +247,10 @@ Backend/
 - O valor da diária é armazenado como `Decimal(10,2)`. O Prisma o serializa como texto na resposta JSON (por exemplo, `"120.5"`), e o frontend deve convertê-lo para número ao exibir ou calcular.
 - Todo veículo cadastrado começa como disponível.
 - O seed usa `upsert`, o que o torna idempotente: executá-lo novamente não duplica usuários nem veículos.
+
+### Frontend
+
+- O token JWT fica no `localStorage` e é anexado a toda requisição por um interceptor do Axios. Ao abrir a aplicação, o `AuthContext` valida o token com `GET /auth/me`.
+- Os formulários são controlados, com um estado para cada campo, e exibem as mensagens de sucesso e de erro retornadas pela API. Os campos de veículo não usam validação nativa do navegador, para que as mensagens de validação venham do backend.
+- A lista de veículos é buscada novamente quando o filtro muda e depois de cada cadastro, porque o efeito que a carrega depende do filtro e de um contador de atualização. Uma variável de controle descarta respostas antigas quando o filtro muda rapidamente.
+- O valor da diária chega da API como texto e é convertido para número e formatado em reais na listagem.

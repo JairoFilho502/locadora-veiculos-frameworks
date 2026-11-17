@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/authRoutes.js";
+import veiculoRoutes from "./routes/veiculoRoutes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
@@ -14,6 +15,7 @@ app.get("/health", (request, response) => {
 });
 
 app.use("/auth", authRoutes);
+app.use("/veiculos", veiculoRoutes);
 
 app.use(errorHandler);
 

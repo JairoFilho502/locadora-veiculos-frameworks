@@ -8,7 +8,7 @@ Projeto final da disciplina Programação com Frameworks Web. O sistema permite 
 |---|---|
 | Jairo George Gama Filho | Base do projeto e autenticação |
 | Arthur Dias de Azevedo | Veículos, dados de exemplo e README |
-| Jorge | Locações (backend) |
+| Jorge Moura Douettes | Locações (backend) |
 | Joao Vitor Fujarra de Santana Santos | Locações (frontend) e interface geral |
 
 ## Tecnologias

@@ -1,21 +1,24 @@
-import { useEffect, useState } from "react";
-import api from "./services/api";
+import { Navigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Cadastro from "./pages/Cadastro";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
 
 function App() {
-  const [status, setStatus] = useState("verificando...");
-
-  useEffect(() => {
-    api
-      .get("/health")
-      .then((resposta) => setStatus(resposta.data.status))
-      .catch(() => setStatus("sem conexão com a API"));
-  }, []);
-
   return (
-    <div>
-      <h1>Locadora de Veículos</h1>
-      <p>Status da API: {status}</p>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/cadastro" element={<Cadastro />} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 

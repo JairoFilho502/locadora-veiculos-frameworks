@@ -1,5 +1,7 @@
 import { useState } from "react";
+import Alerta from "./Alerta";
 import { cadastrarVeiculo } from "../services/veiculoService";
+import { mensagemDeErro } from "../utils/formatacao";
 
 function VeiculoForm({ onCadastrado }) {
   const [marca, setMarca] = useState("");
@@ -33,15 +35,15 @@ function VeiculoForm({ onCadastrado }) {
       setValorDiaria("");
       onCadastrado();
     } catch (error) {
-      setErro(error.response?.data?.error || "Não foi possível conectar à API");
+      setErro(mensagemDeErro(error));
     } finally {
       setEnviando(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
+    <form className="formulario" onSubmit={handleSubmit} noValidate>
+      <div className="campo">
         <label htmlFor="marca">Marca</label>
         <input
           id="marca"
@@ -51,7 +53,7 @@ function VeiculoForm({ onCadastrado }) {
         />
       </div>
 
-      <div>
+      <div className="campo">
         <label htmlFor="modelo">Modelo</label>
         <input
           id="modelo"
@@ -61,7 +63,7 @@ function VeiculoForm({ onCadastrado }) {
         />
       </div>
 
-      <div>
+      <div className="campo">
         <label htmlFor="placa">Placa</label>
         <input
           id="placa"
@@ -72,7 +74,7 @@ function VeiculoForm({ onCadastrado }) {
         />
       </div>
 
-      <div>
+      <div className="campo">
         <label htmlFor="ano">Ano</label>
         <input
           id="ano"
@@ -82,7 +84,7 @@ function VeiculoForm({ onCadastrado }) {
         />
       </div>
 
-      <div>
+      <div className="campo">
         <label htmlFor="valorDiaria">Valor da diária (R$)</label>
         <input
           id="valorDiaria"
@@ -93,12 +95,16 @@ function VeiculoForm({ onCadastrado }) {
         />
       </div>
 
-      <button type="submit" disabled={enviando}>
+      <button type="submit" className="botao" disabled={enviando}>
         {enviando ? "Cadastrando..." : "Cadastrar"}
       </button>
 
-      {mensagem && <p>{mensagem}</p>}
-      {erro && <p>{erro}</p>}
+      <Alerta tipo="sucesso" onFechar={() => setMensagem("")}>
+        {mensagem}
+      </Alerta>
+      <Alerta tipo="erro" onFechar={() => setErro("")}>
+        {erro}
+      </Alerta>
     </form>
   );
 }

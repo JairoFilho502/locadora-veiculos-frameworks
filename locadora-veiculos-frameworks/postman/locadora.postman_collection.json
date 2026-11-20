@@ -1,0 +1,167 @@
+{
+  "info": {
+    "name": "Locadora de Veículos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "token2", "value": "" },
+    { "key": "locacaoId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": { "method": "GET", "url": "{{baseUrl}}/health" }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Jorge\",\n  \"email\": \"jorge@teste.com\",\n  \"senha\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 200) { pm.collectionVariables.set('token', pm.response.json().token); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"jorge@teste.com\",\n  \"senha\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        },
+        {
+          "name": "Register (usuário 2)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Maria\",\n  \"email\": \"maria@teste.com\",\n  \"senha\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Login (usuário 2)",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 200) { pm.collectionVariables.set('token2', pm.response.json().token); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"maria@teste.com\",\n  \"senha\": \"123456\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Locações",
+      "item": [
+        {
+          "name": "Registrar locação",
+          "event": [
+            {
+              "listen": "test",
+              "script": { "exec": ["if (pm.response.code === 201) { pm.collectionVariables.set('locacaoId', pm.response.json().id); }"] }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"veiculoId\": 1,\n  \"dataInicio\": \"2026-11-10T10:00:00Z\",\n  \"dataPrevistaDevolucao\": \"2026-11-12T11:00:00Z\"\n}" },
+            "url": "{{baseUrl}}/locacoes"
+          }
+        },
+        {
+          "name": "Listar minhas locações",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/locacoes"
+          }
+        },
+        {
+          "name": "Finalizar locação",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/locacoes/{{locacaoId}}/finalizar"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Locações - cenários de erro",
+      "item": [
+        {
+          "name": "400 - data prevista antes do início",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"veiculoId\": 1,\n  \"dataInicio\": \"2026-11-12T10:00:00Z\",\n  \"dataPrevistaDevolucao\": \"2026-11-10T10:00:00Z\"\n}" },
+            "url": "{{baseUrl}}/locacoes"
+          }
+        },
+        {
+          "name": "401 - sem token",
+          "request": { "method": "GET", "url": "{{baseUrl}}/locacoes" }
+        },
+        {
+          "name": "403 - finalizar locação de outro usuário",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token2}}" }],
+            "url": "{{baseUrl}}/locacoes/{{locacaoId}}/finalizar"
+          }
+        },
+        {
+          "name": "404 - veículo inexistente",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"veiculoId\": 999,\n  \"dataInicio\": \"2026-11-10T10:00:00Z\",\n  \"dataPrevistaDevolucao\": \"2026-11-12T10:00:00Z\"\n}" },
+            "url": "{{baseUrl}}/locacoes"
+          }
+        },
+        {
+          "name": "404 - locação inexistente",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": "{{baseUrl}}/locacoes/999/finalizar"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 
 function Home() {
@@ -15,6 +15,9 @@ function Home() {
       <h1>Locadora de Veículos</h1>
       <p>Olá, {usuario.nome}!</p>
       <p>Você está logado como {usuario.email}.</p>
+      <p>
+        <Link to="/veiculos">Veículos</Link>
+      </p>
       <button type="button" onClick={handleLogout}>
         Sair
       </button>

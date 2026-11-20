@@ -4,10 +4,11 @@
   "description": "API REST do sistema de locação de veículos",
   "main": "src/index.js",
   "type": "module",
-  "scripts": {
-    "dev": "nodemon src/index.js",
-    "start": "node src/index.js"
-  },
+ "scripts": {
+  "dev": "nodemon src/index.js",
+  "start": "node src/index.js",
+  "seed": "node prisma/seed.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",

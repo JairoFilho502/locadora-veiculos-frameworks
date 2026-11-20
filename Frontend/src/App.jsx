@@ -3,6 +3,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Cadastro from "./pages/Cadastro";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Veiculos from "./pages/Veiculos";
 
 function App() {
   return (
@@ -14,6 +15,14 @@ function App() {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+            <Route
+        path="/veiculos"
+        element={
+          <ProtectedRoute>
+            <Veiculos />
           </ProtectedRoute>
         }
       />

@@ -1,0 +1,96 @@
+@baseUrl = http://localhost:3000
+
+### Cadastro
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "nome": "Maria Silva",
+  "email": "maria@email.com",
+  "senha": "123456"
+}
+
+### Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "maria@email.com",
+  "senha": "123456"
+}
+
+### Meus dados (com token)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{login.response.body.token}}
+
+### Meus dados (sem token)
+GET {{baseUrl}}/auth/me
+
+
+### Cadastrar veículo
+POST {{baseUrl}}/veiculos
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "marca": "Fiat",
+  "modelo": "Uno",
+  "placa": "ABC-1234",
+  "ano": 2020,
+  "valorDiaria": 120.5
+}
+
+### Cadastrar placa repetida
+POST {{baseUrl}}/veiculos
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "marca": "Fiat",
+  "modelo": "Uno",
+  "placa": "abc1234",
+  "ano": 2020,
+  "valorDiaria": 120.5
+}
+
+### Cadastrar dados inválidos
+POST {{baseUrl}}/veiculos
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "marca": "F",
+  "modelo": "",
+  "placa": "12",
+  "ano": 1800,
+  "valorDiaria": -5
+}
+
+### Cadastrar sem token
+POST {{baseUrl}}/veiculos
+Content-Type: application/json
+
+{
+  "marca": "Fiat",
+  "modelo": "Uno",
+  "placa": "XYZ1D23",
+  "ano": 2021,
+  "valorDiaria": 100
+}
+
+### Listar todos
+GET {{baseUrl}}/veiculos
+Authorization: Bearer {{login.response.body.token}}
+
+### Listar disponíveis
+GET {{baseUrl}}/veiculos?disponivel=true
+Authorization: Bearer {{login.response.body.token}}
+
+### Listar indisponíveis
+GET {{baseUrl}}/veiculos?disponivel=false
+Authorization: Bearer {{login.response.body.token}}
+
+### Filtro inválido
+GET {{baseUrl}}/veiculos?disponivel=talvez
+Authorization: Bearer {{login.response.body.token}} 
